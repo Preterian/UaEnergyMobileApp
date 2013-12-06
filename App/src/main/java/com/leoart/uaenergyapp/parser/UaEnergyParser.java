@@ -1,4 +1,6 @@
-package com.leoart.uaenergyapp;
+package com.leoart.uaenergyapp.parser;
+
+import com.leoart.uaenergyapp.model.Post;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

@@ -1,4 +1,7 @@
-package com.leoart.uaenergyapp;
+package com.leoart.uaenergyapp.model;
+
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -7,11 +10,19 @@ package com.leoart.uaenergyapp;
  * Time: 21:56
  * To change this template use File | Settings | File Templates.
  */
+@DatabaseTable(tableName = "post")
 public class Post {
+    public static final String TABLE_NAME = "post";
 
+    @DatabaseField(id = true)
+    private int id;
+    @DatabaseField(canBeNull = false, columnName = "link")
     private String link;
+    @DatabaseField(canBeNull = false, columnName = "link_text")
     private String linkText;
+    @DatabaseField(canBeNull = false, columnName = "link_info")
     private String info;
+    @DatabaseField(canBeNull = false, columnName = "date")
     private String date;
 
     public Post() {
@@ -49,7 +60,5 @@ public class Post {
     public void setDate(String date) {
         this.date = date;
     }
-
-
 
 }
