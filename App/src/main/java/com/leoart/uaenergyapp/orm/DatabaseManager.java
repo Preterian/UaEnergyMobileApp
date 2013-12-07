@@ -8,14 +8,14 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
  * Created by Bogdan on 06.12.13.
  */
 public class DatabaseManager {
-    private DBHelper databaseHelper = null;
+    private DataBaseHelper databaseHelper = null;
 
     //gets a helper once one is created ensures it doesnt create a new one
-    public DBHelper getHelper(Context context)
+    public DataBaseHelper getHelper(Context context)
     {
         if (databaseHelper == null) {
             databaseHelper =
-                    OpenHelperManager.getHelper(context, DBHelper.class);
+                    OpenHelperManager.getHelper(context, DataBaseHelper.class);
         }
         return databaseHelper;
     }

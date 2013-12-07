@@ -2,12 +2,12 @@
 # generated on 2013/11/19 06:44:24
 #
 # --table-start--
-dataClass=com.leoart.uaenergy.model.Post
+dataClass=com.leoart.uaenergyapp.model.Post
 tableName=post
 # --table-fields-start--
 # --field-start--
 fieldName=id
-id=true
+generatedId=true
 # --field-end--
 # --field-start--
 fieldName=link

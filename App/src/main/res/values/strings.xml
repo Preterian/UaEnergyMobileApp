@@ -2,9 +2,17 @@
 <resources>
 
     <string name="app_name">UaEnergyMobile</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Анонси</string>
+    <string name="title_section2">Новини</string>
+    <string name="title_section3">Коментарі</string>
+    <string name="title_section4">Новини компаній</string>
+    <string name="title_section5">Аналітика</string>
+    <string name="title_section6">Публікації</string>
+    <string name="title_section7">Бібліотека</string>
+    <string name="title_section8">Блоги</string>
+    <string name="title_section9">Про нас</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>

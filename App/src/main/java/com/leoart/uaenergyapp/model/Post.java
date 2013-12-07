@@ -61,4 +61,8 @@ public class Post {
         this.date = date;
     }
 
+    public void setId(int id){
+        this.id = id;
+    }
+
 }

@@ -1,9 +1,14 @@
 package com.leoart.uaenergyapp.orm;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
-
+import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
+import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.model.Post;
 import com.leoart.uaenergyapp.parser.UaEnergyParser;
 
@@ -17,42 +22,102 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Created by Bogdan on 06.12.13.
  */
-public class PostsRepository {
-    private DataBaseHelper db;
+public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
+
+    // name of the database file for your application -- change to something
+    // appropriate for your app
+    private static final String DATABASE_NAME = "uaenergy.db";
+    // any time you make changes to your database objects, you may have to
+    // increase the database version
+    private static final int DATABASE_VERSION = 1;
+
+    private static String DB_PATH = "/data/data/com.leoart.android.uaenergy/databases/";
+
+    private static final String TAG = "DBHelper";
+
     // the DAO object we use to access the SimpleData table
     private Dao<Post, Integer> postsDao = null;
 
-    public PostsRepository(Context ctx)
-    {
-        try {
-            DatabaseManager dbManager = new DatabaseManager();
-            db = dbManager.getHelper(ctx);
-            postsDao = db.getPostsDao();
-        } catch (SQLException e) {
-            // TODO: Exception Handling
-            e.printStackTrace();
-        }
+    private final Context myContext;
+
+    public DataBaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION,
+                R.raw.ormlite_config);
+        myContext = context;
     }
 
-    public int create(Post comment)
-    {
+    @Override
+    public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
+
         try {
-            return postsDao.create(comment);
+            TableUtils.createTable(connectionSource, Post.class);
         } catch (SQLException e) {
-            // TODO: Exception Handling
+            Log.e(TAG, "Error while creating DB: " + e.getMessage());
             e.printStackTrace();
         }
-        return 0;
+
     }
 
-    public void parseData() throws SQLException {
+    @Override
+    public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
+                          int oldVersion, int newVersion) {
+
+        try {
+            TableUtils.dropTable(connectionSource, Post.class, true);
+
+            onCreate(db, connectionSource);
+        } catch (SQLException e) {
+            Log.e(TAG, "Error while upgrading DB: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /**
+     * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached
+     * value.
+     */
+    public Dao<Post, Integer> getPostsDao() throws SQLException {
+        if (postsDao == null) {
+            postsDao = getDao(Post.class);
+        }
+        return postsDao;
+    }
+
+    /**
+     * Close the database connections and clear any cached DAOs.
+     */
+    @Override
+    public void close() {
+        super.close();
+        postsDao = null;
+    }
+
+
+    public void parsePosts(){
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                   parseData();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }catch (SQLException e1){
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
+
+    public  void parseData() throws SQLException, IOException {
         String url = "http://ua-energy.org/post/view/1/3";
         Document doc = null;
         try {
@@ -75,8 +140,6 @@ public class PostsRepository {
         System.out.println(info.size());
 
         int len = info.size();
-      //  ArrayList<Post> posts = new ArrayList<Post>(len);
-
 
         // parsing news info
         Elements infoS = content.getElementsByTag("p");
@@ -88,14 +151,13 @@ public class PostsRepository {
             if(isThisDateValid(infoS.get(i).text(),"dd.MM.yyyy" )){
                 date = infoS.get(i).text();
             }
+            post.setId(i);
             post.setLink(links.get(i).attr("href"));
             post.setLinkText(links.get(i).text());
             post.setInfo(info.get(i).text());
             post.setDate(date);
             postsDao.create(post);
-            //posts.add(post);
         }
-
     }
 
 
@@ -127,41 +189,6 @@ public class PostsRepository {
 
         return true;
     }
-
-
-    public int update(Post comment)
-    {
-        try {
-            return postsDao.update(comment);
-        } catch (SQLException e) {
-            // TODO: Exception Handling
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    public int delete(Post comment)
-    {
-        try {
-            return postsDao.delete(comment);
-        } catch (SQLException e) {
-            // TODO: Exception Handling
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public List getAll()
-    {
-        try {
-            return postsDao.queryForAll();
-        } catch (SQLException e) {
-            // TODO: Exception Handling
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
 
 
 
