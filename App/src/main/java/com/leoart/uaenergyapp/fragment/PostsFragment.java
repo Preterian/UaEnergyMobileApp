@@ -9,7 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
@@ -25,6 +27,7 @@ import java.sql.SQLException;
 
 public class PostsFragment extends Fragment {
 
+    private static final String TAG = "PostsFragment";
     final String LOG_TAG = "myLogs";
 
     @Override
@@ -46,11 +49,37 @@ public class PostsFragment extends Fragment {
         mAdapter = new PostsCursorAdapter(UaEnergyApp.context, getCursor());
 
 
-        if(mAdapter!= null){
-            lvMain.setAdapter(mAdapter);
-        }
 
-        // Inflate the layout for this fragment
+        lvMain.setAdapter(mAdapter);
+
+        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long ID) {
+
+
+                        Cursor cursor = mAdapter.getCursor();
+                        cursor.moveToPosition(position);
+
+                        int id = cursor.getInt(cursor.getColumnIndex("id"));
+                        Post post;
+                        try {
+                            post = postsDao.queryForId(id);
+                            if (post != null) {
+                                Log.d(TAG, "Some post was choosed = "
+                                        + post.getLinkText());
+                                Toast.makeText(getActivity(), post.getLinkText(), Toast.LENGTH_SHORT).show();
+
+                            }
+                        } catch (SQLException e) {
+                            Log.e(TAG, "SQL Error: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+            }
+
+        });
+
+
+
         return view;
     }
 

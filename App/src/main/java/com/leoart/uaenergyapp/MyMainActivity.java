@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.leoart.uaenergyapp.fragment.CommentsFragment;
 import com.leoart.uaenergyapp.fragment.FragmentNavigationDrawer;
@@ -66,6 +67,11 @@ public class MyMainActivity extends FragmentActivity {
         // The action bar home/up action should open or close the drawer.
         // ActionBarDrawerToggle will take care of this.
         if (dlDrawer.getDrawerToggle().onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        if (item.getItemId() == R.id.action_example) {
+            Toast.makeText(this, "Example action.", Toast.LENGTH_SHORT).show();
             return true;
         }
 

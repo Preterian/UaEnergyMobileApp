@@ -9,6 +9,8 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.leoart.uaenergyapp.orm.DBHelper;
 import com.leoart.uaenergyapp.orm.DataBaseHelper;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  * Created by Bogdan on 06.12.13.
  */
@@ -48,6 +50,10 @@ public class UaEnergyApp extends Application {
         Log.d(Tag, "App Configuration Changed");
     }
 
+    public static ExecutorService getThreadExecutor() {
+        return threadExecutor;
+    }
+
     public static DataBaseHelper getDatabaseHelper() {
         if(databaseHelper == null){
             databaseHelper = OpenHelperManager.getHelper(UaEnergyApp.context, DataBaseHelper.class);
@@ -60,5 +66,7 @@ public class UaEnergyApp extends Application {
     }
 
     private static DataBaseHelper databaseHelper;
+
+    private static ExecutorService threadExecutor;
 
 }
