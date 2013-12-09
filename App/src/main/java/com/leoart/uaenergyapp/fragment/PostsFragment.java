@@ -2,9 +2,12 @@ package com.leoart.uaenergyapp.fragment;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +70,26 @@ public class PostsFragment extends Fragment {
                             if (post != null) {
                                 Log.d(TAG, "Some post was choosed = "
                                         + post.getLinkText());
-                                Toast.makeText(getActivity(), post.getLinkText(), Toast.LENGTH_SHORT).show();
+
+
+                                FragmentManager myFragmentManager = getFragmentManager();
+
+                                FullPostFragment fragment = new FullPostFragment();
+
+
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("postUrl", post.getLink());
+                                    fragment.setArguments(bundle);
+
+                                    FragmentTransaction fragmentTransaction = myFragmentManager
+                                            .beginTransaction();
+                                    fragmentTransaction.replace(R.id.flContent, fragment);
+                                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentTransaction.commit();
+
+
 
                             }
                         } catch (SQLException e) {

@@ -62,7 +62,7 @@ public class FragmentNavigationDrawer  extends DrawerLayout {
         drawerToggle = setupDrawerToggle();
         setDrawerListener(drawerToggle);
         // set a custom shadow that overlays the main content when the drawer
-      //  setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // Setup action buttons
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);

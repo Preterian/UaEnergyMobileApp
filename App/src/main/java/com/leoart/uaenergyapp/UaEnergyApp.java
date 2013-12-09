@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.leoart.uaenergyapp.model.FullPost;
 import com.leoart.uaenergyapp.orm.DBHelper;
 import com.leoart.uaenergyapp.orm.DataBaseHelper;
 
@@ -68,5 +69,25 @@ public class UaEnergyApp extends Application {
     private static DataBaseHelper databaseHelper;
 
     private static ExecutorService threadExecutor;
+
+    private static FullPost fullPost = new FullPost();
+
+    public static FullPost getFullPost() {
+        return fullPost;
+    }
+
+    public static void setFullPost(FullPost fullPostN) {
+        fullPost = fullPostN;
+    }
+
+    public String getFullPostUrl() {
+        return fullPostUrl;
+    }
+
+    public void setFullPostUrl(String fullPostUrl) {
+        this.fullPostUrl = fullPostUrl;
+    }
+
+    private String fullPostUrl;
 
 }

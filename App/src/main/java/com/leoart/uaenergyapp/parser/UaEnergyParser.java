@@ -1,5 +1,9 @@
 package com.leoart.uaenergyapp.parser;
 
+import android.util.Log;
+
+import com.leoart.uaenergyapp.UaEnergyApp;
+import com.leoart.uaenergyapp.model.FullPost;
 import com.leoart.uaenergyapp.model.Post;
 
 import org.jsoup.Jsoup;
@@ -8,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +28,55 @@ import java.util.logging.Logger;
  * To change this template use File | Settings | File Templates.
  */
 public class UaEnergyParser {
+
+    public static final String TAG = "PARSER";
+
+    public static  void ParseFullPost(final String url){
+
+        new Thread(new Runnable() {
+            public void run() {
+
+                Document doc = null;
+                try {
+                    doc = Jsoup.connect(url).get();
+                } catch (IOException ex) {
+                    Logger.getLogger(UaEnergyParser.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                //parsing post-title
+                Element postTitle = doc.getElementById("left-page-col").select("h2").first();
+
+                //parsing post-author
+                Element postAuthor = doc.getElementById("post-info").select("p").first();
+
+                //parsing post-date
+                Element postDate = doc.getElementById("post-info").select("p").last();
+
+                // parsing post-body
+                Element content = doc.getElementById("post-body");
+
+                Element postBody = content.select("p").first();
+
+
+                FullPost fullPost = new FullPost();
+
+                fullPost.setPostAuthor(postAuthor.text());
+                fullPost.setPostDate(postDate.text());
+                fullPost.setPostTitle(postTitle.text());
+                fullPost.setPostBody(postBody.text());
+
+                UaEnergyApp.setFullPost(fullPost);
+
+                Log.d(TAG, fullPost.getPostDate());
+
+
+            }
+        }).start();
+
+    }
+
+
+
 
     public static void main(String[] args) {
 
