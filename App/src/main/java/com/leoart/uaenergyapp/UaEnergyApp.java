@@ -6,10 +6,15 @@ import android.content.res.Configuration;
 import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.leoart.uaenergyapp.model.FullPost;
+import com.leoart.uaenergyapp.model.Post;
 import com.leoart.uaenergyapp.orm.DBHelper;
 import com.leoart.uaenergyapp.orm.DataBaseHelper;
 
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -26,6 +31,7 @@ public class UaEnergyApp extends Application {
         Log.d(Tag, "Started UaEnergyApp");
 
         context = getApplicationContext();
+        clearDataBase();
     }
 
     @Override
@@ -41,8 +47,18 @@ public class UaEnergyApp extends Application {
     }
 
 
-    public void clearDB(){
+    public static void clearDataBase(){
+        Log.d(Tag, "Clearing dataBase");
+        DataBaseHelper db = UaEnergyApp.getDatabaseHelper();
+        try{
+            Dao<Post, Integer> postDao = db.getDao(Post.class);
 
+            DeleteBuilder<Post, Integer> deletePostBuilder = postDao.deleteBuilder();
+            deletePostBuilder.delete();
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

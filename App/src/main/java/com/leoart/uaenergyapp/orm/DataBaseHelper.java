@@ -35,7 +35,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "uaenergy.db";
     // any time you make changes to your database objects, you may have to
     // increase the database version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 5;
 
     private static String DB_PATH = "/data/data/com.leoart.android.uaenergy/databases/";
 
@@ -101,11 +101,11 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
 
-    public void parsePosts(){
+    public void parsePostsNews(final String url){
         new Thread(new Runnable() {
             public void run() {
                 try {
-                   parseData();
+                   parseData(url);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }catch (SQLException e1){
@@ -117,8 +117,8 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
 
 
 
-    public  void parseData() throws SQLException, IOException {
-        String url = "http://ua-energy.org/post/view/1/3";
+    public  void parseData(String url) throws SQLException, IOException {
+
         Document doc = null;
         try {
             doc = Jsoup.connect(url).get();
@@ -156,7 +156,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
             post.setLinkText(links.get(i).text());
             post.setInfo(info.get(i).text());
             post.setDate(date);
-            postsDao.create(post);
+            postsDao.createOrUpdate(post);
         }
     }
 
