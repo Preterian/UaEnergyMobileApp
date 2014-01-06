@@ -2,7 +2,9 @@ package com.leoart.uaenergyapp.fragment;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import com.leoart.uaenergyapp.UaEnergyApp;
 import com.leoart.uaenergyapp.model.Post;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 
 /**
@@ -71,10 +74,13 @@ public class PostsFragment extends Fragment {
                 final int lastItem = firstVisibleItem + visibleItemCount;
                 if (lastItem == totalItemCount) {
                     // Last item is fully visible.
-                    currentPage++;
+                  /*  currentPage++;
                     loadMore(currentPage);
 
-                    refreshAdapter();
+                    refreshAdapter(); */
+
+                    new loadMoreListView().execute();
+
                     Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
 
                 }
@@ -222,5 +228,76 @@ public class PostsFragment extends Fragment {
         Cursor cursor = UaEnergyApp.getDatabaseHelper().getReadableDatabase().query(Post.TABLE_NAME, new String[]{"id", "link", "link_text", "link_info", "date"}, null, null, null, null, null);
         return cursor;
     }
+
+
+    ProgressDialog pDialog;
+
+
+    /**
+     * Async Task that send a request to url
+     * Gets new list view data
+     * Appends to list view
+     * */
+    private class loadMoreListView extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            // Showing progress dialog before sending http request
+          /*  pDialog = new ProgressDialog(
+                    getActivity());
+            pDialog.setMessage("Please wait..");
+            pDialog.setIndeterminate(true);
+            pDialog.setCancelable(false);
+            pDialog.show();*/
+        }
+
+        protected Void doInBackground(Void... unused) {
+
+
+                    // increment current page
+                    currentPage += 1;
+
+                    // Next page request
+                    String URL = newsPostsUrl.concat("/") + currentPage;
+
+
+            try {
+               UaEnergyApp.getDatabaseHelper(). parseData(URL);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }catch (SQLException e1){
+                e1.printStackTrace();
+            }
+
+
+            getActivity().runOnUiThread(new Runnable() {
+               @Override
+                public void run() {
+
+                    // get listview current position - used to maintain scroll position
+                    int currentPosition = lvMain.getFirstVisiblePosition();
+
+                    // Appending new data to menuItems ArrayList
+                   // adapter = new ListViewAdapter(
+                    //        AndroidListViewWithLoadMoreButtonActivity.this,
+                     //       menuItems);
+                    refreshAdapter();
+                    lvMain.setAdapter(mAdapter);
+                    // Setting new scroll position
+                  //  lvMain.setSelectionFromTop(currentPosition + 1, 0);
+
+                }
+            });
+
+            return (null);
+        }
+
+        protected void onPostExecute(Void unused) {
+            // closing progress dialog
+           // pDialog.dismiss();
+        }
+    }
+
+
 
 }

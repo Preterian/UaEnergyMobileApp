@@ -78,6 +78,10 @@ public class UaEnergyApp extends Application {
         return databaseHelper;
     }
 
+    public static UaEnergyApp getAppInstance(){
+        return appInstance;
+    }
+
     public static void setDatabaseHelper(DataBaseHelper databaseHelper) {
         UaEnergyApp.databaseHelper = databaseHelper;
     }
@@ -105,5 +109,7 @@ public class UaEnergyApp extends Application {
     }
 
     private String fullPostUrl;
+
+    private static UaEnergyApp appInstance;
 
 }
