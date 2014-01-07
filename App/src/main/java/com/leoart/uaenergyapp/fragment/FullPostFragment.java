@@ -1,6 +1,7 @@
 package com.leoart.uaenergyapp.fragment;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -61,6 +62,14 @@ public class FullPostFragment extends Fragment {
         // }
 
 
+        final ProgressDialog pDialog = new ProgressDialog(
+                getActivity());
+        pDialog.setMessage("Please wait...");
+        pDialog.setIndeterminate(true);
+        pDialog.setCancelable(false);
+        pDialog.show();
+
+
         Log.d(LOG_TAG, url);
 
         new Thread(new Runnable() {
@@ -105,6 +114,9 @@ public class FullPostFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        pDialog.dismiss();
+
                         postAuthorView.setText(fullPostAuthor);
 
                         // if(fullPost.getPostDate() != null && !fullPost.getPostDate().equals(""))
