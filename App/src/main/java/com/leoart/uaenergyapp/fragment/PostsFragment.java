@@ -39,7 +39,7 @@ public class PostsFragment extends Fragment {
 
     private static final String TAG = "PostsFragment";
     final String LOG_TAG = "myLogs";
-    private int padding = 5;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,31 +62,21 @@ public class PostsFragment extends Fragment {
         lvMain.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+               if(scrollState == 0){
+                    loading = false;
+               }
             }
 
             @Override
             public void onScroll(AbsListView lw, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-                boolean loadMore = firstVisibleItem + visibleItemCount >= (totalItemCount - padding);
-                //if ((totalItemCount - visibleItemCount) <= (firstVisibleItem)) {
-                    // Last item is fully visible.
-                if(loadMore){
+                boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 
-                    //new loadMoreListView().execute();
-
-                    Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
-
+                if(loadMore && loading == false){
+                    new loadMoreListView().execute();
+                    loading = true;
+                   Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
                 }
-            }
-        });
-
-        Button loadMoreButton = (Button) view.findViewById(R.id.loadMoreButton);
-        loadMoreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new loadMoreListView().execute();
-                Log.d(LOG_TAG, "LOad More Button");
             }
         });
 
@@ -133,8 +123,8 @@ public class PostsFragment extends Fragment {
 
         });
 
-        if(pDialog.isShowing())
-            pDialog.dismiss();
+/*        if(pDialog.isShowing())
+            pDialog.dismiss();*/
 
         return view;
     }
@@ -285,7 +275,6 @@ public class PostsFragment extends Fragment {
             pDialog.dismiss();
         }
     }
-
 
 
 }

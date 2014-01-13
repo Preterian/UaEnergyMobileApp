@@ -35,7 +35,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "uaenergy.db";
     // any time you make changes to your database objects, you may have to
     // increase the database version
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 14;
 
     private static String DB_PATH = "/data/data/com.leoart.android.uaenergy/databases/";
 
