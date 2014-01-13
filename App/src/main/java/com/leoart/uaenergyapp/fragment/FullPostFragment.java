@@ -3,6 +3,7 @@ package com.leoart.uaenergyapp.fragment;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -47,7 +48,7 @@ public class FullPostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.full_post, container, false);
+        final View view = inflater.inflate(R.layout.full_post, container, false);
 
 
         postAuthorView = (TextView) view.findViewById(R.id.full_post_author);
@@ -69,6 +70,7 @@ public class FullPostFragment extends Fragment {
         pDialog.setCancelable(false);
         pDialog.show();
 
+        view.setVisibility(View.INVISIBLE);
 
         Log.d(LOG_TAG, url);
 
@@ -127,6 +129,8 @@ public class FullPostFragment extends Fragment {
 
                         // if(fullPost.getPostBody() != null && !fullPost.getPostBody().equals(""))
                         postBodyView.setText(fullPostBody);
+
+                        view.setVisibility(View.VISIBLE);
                     }
                 });
 
