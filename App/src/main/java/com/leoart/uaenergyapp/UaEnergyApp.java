@@ -49,16 +49,19 @@ public class UaEnergyApp extends Application {
 
     public static void clearDataBase(){
         Log.d(Tag, "Clearing dataBase");
-        DataBaseHelper db = UaEnergyApp.getDatabaseHelper();
+        getDatabaseHelper().reset();
+        /*DataBaseHelper db = UaEnergyApp.getDatabaseHelper();
+
         try{
             Dao<Post, Integer> postDao = db.getDao(Post.class);
 
             DeleteBuilder<Post, Integer> deletePostBuilder = postDao.deleteBuilder();
             deletePostBuilder.delete();
 
+
         }catch (SQLException e){
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override

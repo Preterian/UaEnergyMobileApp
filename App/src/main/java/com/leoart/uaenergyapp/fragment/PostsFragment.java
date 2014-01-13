@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ public class PostsFragment extends Fragment {
 
     private static final String TAG = "PostsFragment";
     final String LOG_TAG = "myLogs";
-
+    private int padding = 5;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,13 +54,9 @@ public class PostsFragment extends Fragment {
             e.printStackTrace();
         }
 
-
-
         lvMain = (ListView) view.findViewById(R.id.lvMain);
 
-
         mAdapter = new PostsCursorAdapter(UaEnergyApp.context, getCursor());
-
 
         lvMain.setAdapter(mAdapter);
         lvMain.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -71,13 +68,25 @@ public class PostsFragment extends Fragment {
             @Override
             public void onScroll(AbsListView lw, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-                if ((totalItemCount - visibleItemCount) <= (firstVisibleItem)) {
+                boolean loadMore = firstVisibleItem + visibleItemCount >= (totalItemCount - padding);
+                //if ((totalItemCount - visibleItemCount) <= (firstVisibleItem)) {
                     // Last item is fully visible.
+                if(loadMore){
 
-                    new loadMoreListView().execute();
+                    //new loadMoreListView().execute();
+
                     Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
 
                 }
+            }
+        });
+
+        Button loadMoreButton = (Button) view.findViewById(R.id.loadMoreButton);
+        loadMoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new loadMoreListView().execute();
+                Log.d(LOG_TAG, "LOad More Button");
             }
         });
 
@@ -149,37 +158,37 @@ public class PostsFragment extends Fragment {
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "Fragment1 onActivityCreated");
+        Log.d(LOG_TAG, "PostsFragment onActivityCreated");
     }
 
     public void onStart() {
         super.onStart();
-        Log.d(LOG_TAG, "Fragment1 onStart");
+        Log.d(LOG_TAG, "PostsFragment onStart");
     }
 
     public void onResume() {
         super.onResume();
-        Log.d(LOG_TAG, "Fragment1 onResume");
+        Log.d(LOG_TAG, "PostsFragment onResume");
     }
 
     public void onPause() {
         super.onPause();
-        Log.d(LOG_TAG, "Fragment1 onPause");
+        Log.d(LOG_TAG, "PostsFragment onPause");
     }
 
     public void onStop() {
         super.onStop();
-        Log.d(LOG_TAG, "Fragment1 onStop");
+        Log.d(LOG_TAG, "PostsFragment onStop");
     }
 
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(LOG_TAG, "Fragment1 onDestroyView");
+        Log.d(LOG_TAG, "PostsFragment onDestroyView");
     }
 
     public void onDestroy() {
         super.onDestroy();
-        Log.d(LOG_TAG, "Fragment1 onDestroy");
+        Log.d(LOG_TAG, "PostsFragment onDestroy");
     }
 
     public void onDetach() {
@@ -250,7 +259,7 @@ public class PostsFragment extends Fragment {
                     String URL = newsPostsUrl.concat("/") + currentPage;
 
             try {
-               UaEnergyApp.getDatabaseHelper(). parseData(URL);
+               UaEnergyApp.getDatabaseHelper().parseData(URL);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }catch (SQLException e1){
@@ -261,12 +270,9 @@ public class PostsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                @Override
                 public void run() {
-
                     // get listview current position - used to maintain scroll position
-                    int currentPosition = lvMain.getFirstVisiblePosition();
-
+                   // int currentPosition = lvMain.getFirstVisiblePosition();
                     refreshAdapter();
-
                 }
             });
 
