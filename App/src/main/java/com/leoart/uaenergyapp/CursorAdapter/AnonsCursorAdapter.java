@@ -13,9 +13,9 @@ import com.leoart.uaenergyapp.R;
 /**
  * Created by bogdan on 1/14/14.
  */
-public class CompanyNewsCursorAdapter extends BaseAdapter {
+public class AnonsCursorAdapter  extends BaseAdapter {
 
-    public CompanyNewsCursorAdapter(Context context, Cursor cursor){
+    public AnonsCursorAdapter(Context context, Cursor cursor){
         this.setContext(context);
         this.setCursor(cursor);
     }
@@ -36,8 +36,8 @@ public class CompanyNewsCursorAdapter extends BaseAdapter {
     }
 
     static class ViewHolder{
-        public TextView postDate;
         public TextView postTitle;
+        public TextView postInfo;
     }
 
     @Override
@@ -45,26 +45,28 @@ public class CompanyNewsCursorAdapter extends BaseAdapter {
 
         ViewHolder vh;
 
-      //  if(convertView == null){
+        //  if(convertView == null){
         LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = li.inflate(R.layout.company_news_cell, parent, false);
+        convertView = li.inflate(R.layout.anons_cell, parent, false);
 
         vh = new ViewHolder();
-        vh.postDate = (TextView) convertView.findViewById(R.id.company_news_date);
-        vh.postTitle = (TextView) convertView.findViewById(R.id.company_news_title);
+        vh.postInfo = (TextView) convertView.findViewById(R.id.anons_info);
+        vh.postTitle = (TextView) convertView.findViewById(R.id.anons_title);
         // }else{
         //     vh = (ViewHolder) convertView.getTag();
-       // }
+        //}
 
         getCursor().moveToPosition(position);
 
         String postTitle = getCursor().getString(getCursor().getColumnIndex("link_text"));
-        String postDate = getCursor().getString(getCursor().getColumnIndex("date"));
+        String postInfo = getCursor().getString(getCursor().getColumnIndex("link_info"));
 
-        if( !postTitle.equals("") && !postDate.equals("")){
+
+        if(!postInfo.equals("") && !postTitle.equals("")){
+            vh.postInfo.setText(postInfo);
             vh.postTitle.setText(postTitle);
-            vh.postDate.setText(postDate);
         }
+
 
         return convertView;
     }

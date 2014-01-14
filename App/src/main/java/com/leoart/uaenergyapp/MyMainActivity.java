@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.leoart.uaenergyapp.fragment.AnalyticFragment;
+import com.leoart.uaenergyapp.fragment.AnonsFragment;
 import com.leoart.uaenergyapp.fragment.CommentsFragment;
 import com.leoart.uaenergyapp.fragment.CompanyNewsFragment;
 import com.leoart.uaenergyapp.fragment.FragmentNavigationDrawer;
@@ -33,8 +34,8 @@ public class MyMainActivity extends FragmentActivity {
         dlDrawer.setupDrawerConfiguration((ListView) findViewById(R.id.lvDrawer),
                 R.layout.drawer_nav_item, R.id.flContent);
         // Add nav items
-        dlDrawer.addNavItem("Анонси", "Анонси", PostsFragment.class);
         dlDrawer.addNavItem("Новини", "Новини", PostsFragment.class);
+        dlDrawer.addNavItem("Анонси", "Анонси", AnonsFragment.class);
         dlDrawer.addNavItem("Коментарі", "Коментарі", CommentsFragment.class);
         dlDrawer.addNavItem("Новини компаній", "Новини компаній", CompanyNewsFragment.class);
         dlDrawer.addNavItem("Аналітика", "Аналітика", AnalyticFragment.class);

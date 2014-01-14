@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/post_background">
+
+
+
+    <TextView
+        android:id="@+id/anons_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/post_title"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:paddingBottom="5dp"/>
+    <TextView
+        android:id="@+id/anons_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/post_info"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:textSize="12sp"
+        android:textColor="@android:color/secondary_text_light"
+        android:layout_below="@+id/anons_title"
+        android:paddingBottom="20dp"/>
+</RelativeLayout>

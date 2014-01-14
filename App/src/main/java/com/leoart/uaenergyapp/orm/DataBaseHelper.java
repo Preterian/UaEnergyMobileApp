@@ -54,6 +54,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Analytic, Integer> analyticDao = null;
     private Dao<Publications, Integer> publicationsDao = null;
     private Dao<CompanyNews, Integer> companyNewsDao = null;
+    private Dao<Anons, Integer> anonsDao = null;
 
     private final Context myContext;
 
@@ -145,6 +146,13 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
         return companyNewsDao;
     }
 
+    public Dao<Anons, Integer> getAnonsDao() throws SQLException {
+        if(anonsDao == null){
+            anonsDao = getDao(Anons.class);
+        }
+        return anonsDao;
+    }
+
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -154,6 +162,62 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
         postsDao = null;
         commentsDao = null;
     }
+
+    public void parseAnonsSafe(final String url){
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    parseAnons(url);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }catch (SQLException e1){
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
+    public void parseAnons(String url) throws SQLException, IOException {
+
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException ex) {
+            Logger.getLogger(UaEnergyParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        Element content = doc.getElementById("post-list");
+
+        // parsing posts links
+        Elements links = content.getElementsByTag("a");
+
+        // parsing posts info
+        Elements info = content.select("p.info");
+
+        int len = info.size();
+
+        // parsing news info
+        Elements infoS = content.getElementsByTag("p");
+
+
+        int j = 0;
+
+
+        Log.d(TAG, "Adding anons to DB");
+        for(int  i = 0; i < len; i++){
+            Anons post = new Anons();
+            post.setId(i);
+            post.setLink(links.get(i).attr("href"));
+            post.setLinkText(links.get(i).text());
+            post.setInfo(info.get(i).text());
+            anonsDao.createOrUpdate(post);
+        }
+
+
+    }
+
 
 
     public void parseCompanyNewsSafe(final String url){
@@ -201,7 +265,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
             int j = 0;
 
 
-                Log.d(TAG, "Adding posts to DB");
+                Log.d(TAG, "Adding companyNews to DB");
                 for(int  i = 0; i < len; i++){
                     CompanyNews post = new CompanyNews();
                     if(isThisDateValid(infoS.get(i).text(),"dd.MM.yyyy" )){
