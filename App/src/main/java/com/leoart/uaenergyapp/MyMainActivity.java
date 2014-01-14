@@ -9,10 +9,13 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.leoart.uaenergyapp.fragment.Analitic;
+import com.leoart.uaenergyapp.fragment.AnalyticFragment;
 import com.leoart.uaenergyapp.fragment.CommentsFragment;
+import com.leoart.uaenergyapp.fragment.CompanyNewsFragment;
 import com.leoart.uaenergyapp.fragment.FragmentNavigationDrawer;
 import com.leoart.uaenergyapp.fragment.PostsFragment;
+import com.leoart.uaenergyapp.fragment.PublicationsFragment;
+import com.leoart.uaenergyapp.model.Publications;
 
 /**
  * Created by Bogdan on 07.12.13.
@@ -30,12 +33,12 @@ public class MyMainActivity extends FragmentActivity {
         dlDrawer.setupDrawerConfiguration((ListView) findViewById(R.id.lvDrawer),
                 R.layout.drawer_nav_item, R.id.flContent);
         // Add nav items
-        dlDrawer.addNavItem("Анонси", "Анонси", CommentsFragment.class);
+        dlDrawer.addNavItem("Анонси", "Анонси", PostsFragment.class);
         dlDrawer.addNavItem("Новини", "Новини", PostsFragment.class);
-        dlDrawer.addNavItem("Коментарі", "Коментарі", PostsFragment.class);
-        dlDrawer.addNavItem("Новини компаній", "Новини компаній", PostsFragment.class);
-        dlDrawer.addNavItem("Аналітика", "Аналітика", Analitic.class);
-        dlDrawer.addNavItem("Публікації", "Публікації", PostsFragment.class);
+        dlDrawer.addNavItem("Коментарі", "Коментарі", CommentsFragment.class);
+        dlDrawer.addNavItem("Новини компаній", "Новини компаній", CompanyNewsFragment.class);
+        dlDrawer.addNavItem("Аналітика", "Аналітика", AnalyticFragment.class);
+        dlDrawer.addNavItem("Публікації", "Публікації", PublicationsFragment.class);
         dlDrawer.addNavItem("Бібліотека", "Бібліотека", PostsFragment.class);
         dlDrawer.addNavItem("Блоги", "Блоги", PostsFragment.class);
         dlDrawer.addNavItem("Про нас", "Про нас", PostsFragment.class);

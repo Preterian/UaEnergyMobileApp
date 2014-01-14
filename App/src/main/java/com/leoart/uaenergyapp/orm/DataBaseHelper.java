@@ -9,7 +9,14 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.leoart.uaenergyapp.R;
+import com.leoart.uaenergyapp.model.Analytic;
+import com.leoart.uaenergyapp.model.Anons;
+import com.leoart.uaenergyapp.model.Blogs;
+import com.leoart.uaenergyapp.model.Comments;
+import com.leoart.uaenergyapp.model.CompanyNews;
+import com.leoart.uaenergyapp.model.Library;
 import com.leoart.uaenergyapp.model.Post;
+import com.leoart.uaenergyapp.model.Publications;
 import com.leoart.uaenergyapp.parser.UaEnergyParser;
 
 import org.jsoup.Jsoup;
@@ -35,7 +42,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "uaenergy.db";
     // any time you make changes to your database objects, you may have to
     // increase the database version
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 16;
 
     private static String DB_PATH = "/data/data/com.leoart.android.uaenergy/databases/";
 
@@ -43,6 +50,10 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
 
     // the DAO object we use to access the SimpleData table
     private Dao<Post, Integer> postsDao = null;
+    private Dao<Comments, Integer> commentsDao = null;
+    private Dao<Analytic, Integer> analyticDao = null;
+    private Dao<Publications, Integer> publicationsDao = null;
+    private Dao<CompanyNews, Integer> companyNewsDao = null;
 
     private final Context myContext;
 
@@ -57,6 +68,13 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
 
         try {
             TableUtils.createTable(connectionSource, Post.class);
+            TableUtils.createTable(connectionSource, Analytic.class);
+            TableUtils.createTable(connectionSource, Anons.class);
+            TableUtils.createTable(connectionSource, Blogs.class);
+            TableUtils.createTable(connectionSource, Comments.class);
+            TableUtils.createTable(connectionSource, CompanyNews.class);
+            TableUtils.createTable(connectionSource, Library.class);
+            TableUtils.createTable(connectionSource, Publications.class);
         } catch (SQLException e) {
             Log.e(TAG, "Error while creating DB: " + e.getMessage());
             e.printStackTrace();
@@ -70,6 +88,14 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
 
         try {
             TableUtils.dropTable(connectionSource, Post.class, true);
+
+            TableUtils.dropTable(connectionSource, Analytic.class, true);
+            TableUtils.dropTable(connectionSource, Anons.class, true);
+            TableUtils.dropTable(connectionSource, Blogs.class, true);
+            TableUtils.dropTable(connectionSource, Comments.class, true);
+            TableUtils.dropTable(connectionSource, CompanyNews.class, true);
+            TableUtils.dropTable(connectionSource, Library.class, true);
+            TableUtils.dropTable(connectionSource, Publications.class, true);
 
             onCreate(db, connectionSource);
         } catch (SQLException e) {
@@ -91,6 +117,34 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
         return postsDao;
     }
 
+    public Dao<Comments, Integer> getCommentsDao() throws SQLException {
+        if(commentsDao == null){
+            commentsDao = getDao(Comments.class);
+        }
+        return  commentsDao;
+    }
+
+    public Dao<Analytic, Integer> getAnalyticDao() throws SQLException {
+        if(analyticDao == null){
+            analyticDao = getDao(Analytic.class);
+        }
+        return analyticDao;
+    }
+
+    public Dao<Publications, Integer> getPublicationsDao() throws SQLException {
+        if(publicationsDao == null){
+            publicationsDao = getDao(Publications.class);
+        }
+        return publicationsDao;
+    }
+
+    public Dao<CompanyNews, Integer> getCompanyNewsDao() throws SQLException {
+        if(companyNewsDao == null){
+            companyNewsDao = getDao(CompanyNews.class);
+        }
+        return companyNewsDao;
+    }
+
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -98,14 +152,77 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     public void close() {
         super.close();
         postsDao = null;
+        commentsDao = null;
     }
 
 
-    public void parsePostsNews(final String url){
+    public void parseCompanyNewsSafe(final String url){
         new Thread(new Runnable() {
             public void run() {
                 try {
-                   parseData(url);
+                    parseCompanyNews(url);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }catch (SQLException e1){
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
+    public void parseCompanyNews(String url) throws SQLException, IOException {
+
+            Document doc = null;
+            try {
+                doc = Jsoup.connect(url).get();
+            } catch (IOException ex) {
+                Logger.getLogger(UaEnergyParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+
+            Element content = doc.getElementById("post-list");
+
+            // parsing posts links
+            Elements links = content.getElementsByTag("a");
+
+            // parsing posts dates
+            Elements dates = content.select("div.postlist-date");
+
+            System.out.println(links.size());
+
+
+            int len = dates.size();
+
+            // parsing news info
+            Elements infoS = content.getElementsByTag("p");
+
+            String date = null;
+            int j = 0;
+
+
+                Log.d(TAG, "Adding posts to DB");
+                for(int  i = 0; i < len; i++){
+                    CompanyNews post = new CompanyNews();
+                    if(isThisDateValid(infoS.get(i).text(),"dd.MM.yyyy" )){
+                        date = infoS.get(i).text();
+                    }
+                    post.setId(i);
+                    post.setLink(links.get(i).attr("href"));
+                    post.setLinkText(links.get(i).text());
+                    post.setDate(date);
+                    companyNewsDao.createOrUpdate(post);
+                }
+
+
+    }
+
+
+    public void parsePostsNews(final String url, final String category){
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                   parseData(url, category);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }catch (SQLException e1){
@@ -117,7 +234,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
 
 
 
-    public  void parseData(String url) throws SQLException, IOException {
+    public  void parseData(String url, String category) throws SQLException, IOException {
 
         Document doc = null;
         try {
@@ -146,6 +263,9 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
 
         String date = null;
         int j = 0;
+
+        if(category.equals("news")){
+            Log.d(TAG, "Adding posts to DB");
         for(int  i = 0; i < len; i++){
             Post post = new Post();
             if(isThisDateValid(infoS.get(i).text(),"dd.MM.yyyy" )){
@@ -158,6 +278,60 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
             post.setDate(date);
             postsDao.createOrUpdate(post);
         }
+            return;
+        }
+
+        if(category.equals("comments")){
+            Log.d(TAG, "Adding comments to DB");
+            for(int  i = 0; i < len; i++){
+                Comments comments = new Comments();
+                if(isThisDateValid(infoS.get(i).text(),"dd.MM.yyyy" )){
+                    date = infoS.get(i).text();
+                }
+                comments.setId(i);
+                comments.setLink(links.get(i).attr("href"));
+                comments.setLinkText(links.get(i).text());
+                comments.setInfo(info.get(i).text());
+                comments.setDate(date);
+                commentsDao.createOrUpdate(comments);
+            }
+            return;
+        }
+
+        if(category.equals("analytic")){
+            Log.d(TAG, "Adding analytic data to DB");
+            for(int  i = 0; i < len; i++){
+                Analytic analytic = new Analytic();
+                if(isThisDateValid(infoS.get(i).text(),"dd.MM.yyyy" )){
+                    date = infoS.get(i).text();
+                }
+                analytic.setId(i);
+                analytic.setLink(links.get(i).attr("href"));
+                analytic.setLinkText(links.get(i).text());
+                analytic.setInfo(info.get(i).text());
+                analytic.setDate(date);
+                analyticDao.createOrUpdate(analytic);
+            }
+            return;
+        }
+
+        if(category.equals("publications")){
+            Log.d(TAG, "Adding publications data to DB");
+            for(int  i = 0; i < len; i++){
+                Publications analytic = new Publications();
+                if(isThisDateValid(infoS.get(i).text(),"dd.MM.yyyy" )){
+                    date = infoS.get(i).text();
+                }
+                analytic.setId(i);
+                analytic.setLink(links.get(i).attr("href"));
+                analytic.setLinkText(links.get(i).text());
+                analytic.setInfo(info.get(i).text());
+                analytic.setDate(date);
+                publicationsDao.createOrUpdate(analytic);
+            }
+            return;
+        }
+
     }
 
 
@@ -194,6 +368,13 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     public void reset(){
         SQLiteDatabase db = this.getWritableDatabase(); // helper is object extends SQLiteOpenHelper
         db.delete("post", null, null);
+        db.delete("analytic", null, null);
+        db.delete("anons", null, null);
+        db.delete("blogs", null, null);
+        db.delete("comments", null, null);
+        db.delete("company_news", null, null);
+        db.delete("library", null, null);
+        db.delete("publications", null, null);
     }
 
 }

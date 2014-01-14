@@ -23,6 +23,7 @@ import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
+import com.leoart.uaenergyapp.model.Analytic;
 import com.leoart.uaenergyapp.model.Post;
 
 import java.io.IOException;
@@ -31,10 +32,10 @@ import java.sql.SQLException;
 /**
  * Created by bogdan on 1/7/14.
  */
-public class Analitic extends Fragment {
+public class AnalyticFragment extends Fragment {
 
-    private static final String TAG = "PostsFragment";
-    final String LOG_TAG = "myLogs";
+    private static final String TAG = "AnalyticFragment";
+    final String LOG_TAG = "AnalyticFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,44 +44,33 @@ public class Analitic extends Fragment {
         View view = inflater.inflate(R.layout.posts, container, false);
 
         try {
-            // UaEnergyApp.getDatabaseHelper().parsePosts();
-            postsDao = UaEnergyApp.getDatabaseHelper().getPostsDao();
+            analyticDao = UaEnergyApp.getDatabaseHelper().getAnalyticDao();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-
-
         lvMain = (ListView) view.findViewById(R.id.lvMain);
 
-
         mAdapter = new PostsCursorAdapter(UaEnergyApp.context, getCursor());
-
 
         lvMain.setAdapter(mAdapter);
         lvMain.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+                if(scrollState == 0){
+                    loading = false;
+                }
             }
 
             @Override
             public void onScroll(AbsListView lw, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                // Make your calculation stuff here. You have all your
-                // needed info from the parameters of this function.
 
-                // Sample calculation to determine if the last
-                // item is fully visible.
-                // final int lastItem = firstVisibleItem + visibleItemCount;
-                // if (lastItem == totalItemCount) {
-                if ((totalItemCount - visibleItemCount) <= (firstVisibleItem)) {
-                    // Last item is fully visible.
+                boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 
+                if(loadMore && loading == false){
                     new loadMoreListView().execute();
-
-                    Toast.makeText(getActivity(), "Last one", Toast.LENGTH_LONG).show();
+                    loading = true;
                     Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
-
                 }
             }
         });
@@ -94,9 +84,9 @@ public class Analitic extends Fragment {
                 cursor.moveToPosition(position);
 
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
-                Post post;
+                Analytic post;
                 try {
-                    post = postsDao.queryForId(id);
+                    post = analyticDao.queryForId(id);
                     if (post != null) {
                         Log.d(TAG, "Some post was choosed = "
                                 + post.getLinkText());
@@ -128,6 +118,8 @@ public class Analitic extends Fragment {
 
         });
 
+/*        if(pDialog.isShowing())
+            pDialog.dismiss();*/
 
         return view;
     }
@@ -145,7 +137,7 @@ public class Analitic extends Fragment {
 
         // UaEnergyApp.clearDataBase();
 
-        UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl);
+        //UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl);
 
     }
 
@@ -207,17 +199,16 @@ public class Analitic extends Fragment {
     private int currentPage = 1;
 
     private boolean loading = false;
-    private boolean loadedAll = false;
 
     private PostsCursorAdapter mAdapter;
-    private Dao<Post, Integer> postsDao;
+    private Dao<Analytic, Integer> analyticDao;
 
     private  ListView lvMain = null;
 
     private String newsPostsUrl = "http://ua-energy.org/post/view/4";
 
     protected Cursor getCursor() {
-        Cursor cursor = UaEnergyApp.getDatabaseHelper().getReadableDatabase().query(Post.TABLE_NAME, new String[]{"id", "link", "link_text", "link_info", "date"}, null, null, null, null, null);
+        Cursor cursor = UaEnergyApp.getDatabaseHelper().getReadableDatabase().query(Analytic.TABLE_NAME, new String[]{"id", "link", "link_text", "link_info", "date"}, null, null, null, null, null);
         return cursor;
     }
 
@@ -236,12 +227,12 @@ public class Analitic extends Fragment {
         protected void onPreExecute() {
             // Showing progress dialog before sending http request
             Log.d(LOG_TAG, "Setting progressDialog");
-           /* pDialog = new ProgressDialog(
+            pDialog = new ProgressDialog(
                     getActivity());
             pDialog.setMessage("Почекайте будь ласка, дані завантажуються..");
             pDialog.setIndeterminate(true);
             pDialog.setCancelable(false);
-            pDialog.show(); */
+            pDialog.show();
         }
 
         protected Void doInBackground(Void... unused) {
@@ -255,7 +246,7 @@ public class Analitic extends Fragment {
 
 
             try {
-                UaEnergyApp.getDatabaseHelper(). parseData(URL);
+                UaEnergyApp.getDatabaseHelper(). parseData(URL, "analytic");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }catch (SQLException e1){
@@ -267,18 +258,7 @@ public class Analitic extends Fragment {
                 @Override
                 public void run() {
 
-                    // get listview current position - used to maintain scroll position
-                    int currentPosition = lvMain.getFirstVisiblePosition();
-
-                    // Appending new data to menuItems ArrayList
-                    // adapter = new ListViewAdapter(
-                    //        AndroidListViewWithLoadMoreButtonActivity.this,
-                    //       menuItems);
                     refreshAdapter();
-                    // lvMain.setAdapter(mAdapter);
-                    // Setting new scroll position
-                    //  lvMain.setSelectionFromTop(currentPosition + 1, 0);
-
 
                 }
             });
@@ -289,7 +269,7 @@ public class Analitic extends Fragment {
         protected void onPostExecute(Void unused) {
             // closing progress dialog
             Log.d(LOG_TAG, "Dismissing progress Dialog");
-            //pDialog.dismiss();
+            pDialog.dismiss();
         }
     }
 

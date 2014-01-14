@@ -1,13 +1,11 @@
 package com.leoart.uaenergyapp.fragment;
 
-
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -16,30 +14,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
-import com.leoart.uaenergyapp.model.Post;
+import com.leoart.uaenergyapp.model.Analytic;
+import com.leoart.uaenergyapp.model.Publications;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-
-
 /**
- * Created by Bogdan on 06.12.13.
+ * Created by bogdan on 1/14/14.
  */
+public class PublicationsFragment extends Fragment {
 
-public class PostsFragment extends Fragment {
-
-    private static final String TAG = "PostsFragment";
-    final String LOG_TAG = "myLogs";
-
+    private static final String TAG = "PublicationsFragment";
+    final String LOG_TAG = "PublicationsFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,8 +41,7 @@ public class PostsFragment extends Fragment {
         View view = inflater.inflate(R.layout.posts, container, false);
 
         try {
-            // UaEnergyApp.getDatabaseHelper().parsePosts();
-            postsDao = UaEnergyApp.getDatabaseHelper().getPostsDao();
+            publicationsDao = UaEnergyApp.getDatabaseHelper().getPublicationsDao();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -62,9 +54,9 @@ public class PostsFragment extends Fragment {
         lvMain.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-               if(scrollState == 0){
+                if(scrollState == 0){
                     loading = false;
-               }
+                }
             }
 
             @Override
@@ -75,7 +67,7 @@ public class PostsFragment extends Fragment {
                 if(loadMore && loading == false){
                     new loadMoreListView().execute();
                     loading = true;
-                   Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
+                    Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
                 }
             }
         });
@@ -89,9 +81,9 @@ public class PostsFragment extends Fragment {
                 cursor.moveToPosition(position);
 
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
-                Post post;
+                Publications post;
                 try {
-                    post = postsDao.queryForId(id);
+                    post = publicationsDao.queryForId(id);
                     if (post != null) {
                         Log.d(TAG, "Some post was choosed = "
                                 + post.getLinkText());
@@ -123,9 +115,6 @@ public class PostsFragment extends Fragment {
 
         });
 
-/*        if(pDialog.isShowing())
-            pDialog.dismiss();*/
-
         return view;
     }
 
@@ -139,46 +128,46 @@ public class PostsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "Fragment1 onCreate");
-        Log.d(LOG_TAG, "TIIIITLE = " +  getActivity().getTitle());
 
-       // UaEnergyApp.clearDataBase();
+        // UaEnergyApp.clearDataBase();
 
-        UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl, "news");
+        UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl, "publications");
+
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "PostsFragment onActivityCreated");
+        Log.d(LOG_TAG, "Fragment1 onActivityCreated");
     }
 
     public void onStart() {
         super.onStart();
-        Log.d(LOG_TAG, "PostsFragment onStart");
+        Log.d(LOG_TAG, "Fragment1 onStart");
     }
 
     public void onResume() {
         super.onResume();
-        Log.d(LOG_TAG, "PostsFragment onResume");
+        Log.d(LOG_TAG, "Fragment1 onResume");
     }
 
     public void onPause() {
         super.onPause();
-        Log.d(LOG_TAG, "PostsFragment onPause");
+        Log.d(LOG_TAG, "Fragment1 onPause");
     }
 
     public void onStop() {
         super.onStop();
-        Log.d(LOG_TAG, "PostsFragment onStop");
+        Log.d(LOG_TAG, "Fragment1 onStop");
     }
 
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(LOG_TAG, "PostsFragment onDestroyView");
+        Log.d(LOG_TAG, "Fragment1 onDestroyView");
     }
 
     public void onDestroy() {
         super.onDestroy();
-        Log.d(LOG_TAG, "PostsFragment onDestroy");
+        Log.d(LOG_TAG, "Fragment1 onDestroy");
     }
 
     public void onDetach() {
@@ -204,17 +193,16 @@ public class PostsFragment extends Fragment {
     private int currentPage = 1;
 
     private boolean loading = false;
-    private boolean loadedAll = false;
 
     private PostsCursorAdapter mAdapter;
-    private Dao<Post, Integer> postsDao;
+    private Dao<Publications, Integer> publicationsDao;
 
     private  ListView lvMain = null;
 
-    private String newsPostsUrl = "http://ua-energy.org/post/view/1";
+    private String newsPostsUrl = "http://ua-energy.org/post/view/5";
 
     protected Cursor getCursor() {
-        Cursor cursor = UaEnergyApp.getDatabaseHelper().getReadableDatabase().query(Post.TABLE_NAME, new String[]{"id", "link", "link_text", "link_info", "date"}, null, null, null, null, null);
+        Cursor cursor = UaEnergyApp.getDatabaseHelper().getReadableDatabase().query(Publications.TABLE_NAME, new String[]{"id", "link", "link_text", "link_info", "date"}, null, null, null, null, null);
         return cursor;
     }
 
@@ -233,7 +221,7 @@ public class PostsFragment extends Fragment {
         protected void onPreExecute() {
             // Showing progress dialog before sending http request
             Log.d(LOG_TAG, "Setting progressDialog");
-           pDialog = new ProgressDialog(
+            pDialog = new ProgressDialog(
                     getActivity());
             pDialog.setMessage("Почекайте будь ласка, дані завантажуються..");
             pDialog.setIndeterminate(true);
@@ -242,14 +230,17 @@ public class PostsFragment extends Fragment {
         }
 
         protected Void doInBackground(Void... unused) {
-                    // increment current page
-                    currentPage += 1;
 
-                    // Next page request
-                    String URL = newsPostsUrl.concat("/") + currentPage;
+
+            // increment current page
+            currentPage += 1;
+
+            // Next page request
+            String URL = newsPostsUrl.concat("/") + currentPage;
+
 
             try {
-               UaEnergyApp.getDatabaseHelper().parseData(URL,"news");
+                UaEnergyApp.getDatabaseHelper(). parseData(URL, "publications");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }catch (SQLException e1){
@@ -258,11 +249,11 @@ public class PostsFragment extends Fragment {
 
 
             getActivity().runOnUiThread(new Runnable() {
-               @Override
+                @Override
                 public void run() {
-                    // get listview current position - used to maintain scroll position
-                   // int currentPosition = lvMain.getFirstVisiblePosition();
+
                     refreshAdapter();
+
                 }
             });
 
@@ -275,6 +266,5 @@ public class PostsFragment extends Fragment {
             pDialog.dismiss();
         }
     }
-
 
 }
