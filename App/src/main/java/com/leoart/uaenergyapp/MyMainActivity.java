@@ -1,8 +1,13 @@
 package com.leoart.uaenergyapp;
 
+import android.annotation.TargetApi;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,17 +16,23 @@ import android.widget.Toast;
 
 import com.leoart.uaenergyapp.fragment.AnalyticFragment;
 import com.leoart.uaenergyapp.fragment.AnonsFragment;
+import com.leoart.uaenergyapp.fragment.BlogsFragment;
 import com.leoart.uaenergyapp.fragment.CommentsFragment;
 import com.leoart.uaenergyapp.fragment.CompanyNewsFragment;
 import com.leoart.uaenergyapp.fragment.FragmentNavigationDrawer;
 import com.leoart.uaenergyapp.fragment.PostsFragment;
 import com.leoart.uaenergyapp.fragment.PublicationsFragment;
+import com.leoart.uaenergyapp.model.Anons;
 import com.leoart.uaenergyapp.model.Publications;
+import com.leoart.uaenergyapp.utils.Rest;
+
+import java.util.List;
 
 /**
  * Created by Bogdan on 07.12.13.
  */
 public class MyMainActivity extends FragmentActivity {
+    private static final String LOG_TAG = "MyMainActivity";
     private FragmentNavigationDrawer dlDrawer;
 
     @Override
@@ -41,7 +52,7 @@ public class MyMainActivity extends FragmentActivity {
         dlDrawer.addNavItem("Аналітика", "Аналітика", AnalyticFragment.class);
         dlDrawer.addNavItem("Публікації", "Публікації", PublicationsFragment.class);
         dlDrawer.addNavItem("Бібліотека", "Бібліотека", PostsFragment.class);
-        dlDrawer.addNavItem("Блоги", "Блоги", PostsFragment.class);
+        dlDrawer.addNavItem("Блоги", "Блоги", BlogsFragment.class);
         dlDrawer.addNavItem("Про нас", "Про нас", PostsFragment.class);
 
         // Select default
@@ -60,10 +71,63 @@ public class MyMainActivity extends FragmentActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    protected static final int BTN_REFRESH = 0x1020;
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
+
+        MenuItem item = menu.add(0, BTN_REFRESH, 0, R.string.refresh);
+        item.setIcon(R.drawable.ic_menu_refresh);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (Rest.isNetworkOnline()) {
+                    //should refresh current screen
+                    if(getVisibleFragment().toString().contains("Posts")){
+                        Log.d(LOG_TAG, "Posts should be refreshed...");
+                        PostsFragment.refreshScreen();
+                        return false;
+                    }
+
+                    if(getVisibleFragment().toString().contains("Anons")){
+                        Log.d(LOG_TAG, "Anons should be refreshed...");
+                        return false;
+                    }
+
+                    if(getVisibleFragment().toString().contains("Publications")){
+                        Log.d(LOG_TAG, "Publications should be refreshed...");
+                        return false;
+                    }
+
+                    if(getVisibleFragment().toString().contains("Analytic")){
+                        Log.d(LOG_TAG, "Analytics should be refreshed...");
+                        return false;
+                    }
+
+                    if(getVisibleFragment().toString().contains("Blogs")){
+                        Log.d(LOG_TAG, "Blogs should be refreshed...");
+                        return false;
+                    }
+
+                    if(getVisibleFragment().toString().contains("Comments")){
+                        Log.d(LOG_TAG, "Comments should be refreshed...");
+                        return false;
+                    }
+
+                    if(getVisibleFragment().toString().contains("CompanyNews")){
+                        Log.d(LOG_TAG, "CompanyNews should be refreshed...");
+                        return false;
+                    }
+                }
+
+                return false;
+            }
+        });
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -75,12 +139,24 @@ public class MyMainActivity extends FragmentActivity {
             return true;
         }
 
-        if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(this, "Example action.", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.action_refresh) {
+            ////////////////
+
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public Fragment getVisibleFragment(){
+        FragmentManager fragmentManager = MyMainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        for(Fragment fragment : fragments){
+            if(fragment.isVisible())
+                return fragment;
+        }
+        return null;
     }
 
     @Override

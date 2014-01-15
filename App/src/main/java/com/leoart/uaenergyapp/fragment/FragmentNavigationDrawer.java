@@ -57,6 +57,7 @@ public class FragmentNavigationDrawer  extends DrawerLayout {
         lvDrawer.setAdapter(drawerAdapter);
         // Setup item listener
         lvDrawer.setOnItemClickListener(new FragmentDrawerItemListener());
+        lvDrawer.setBackgroundColor(getResources().getColor(R.color.background));
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
         drawerToggle = setupDrawerToggle();

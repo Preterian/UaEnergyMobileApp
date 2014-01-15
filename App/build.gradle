@@ -14,7 +14,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion '19.0.0'
 
     defaultConfig {
         minSdkVersion 10
@@ -34,7 +34,9 @@ android {
 }
 
 dependencies {
-	compile 'com.android.support:appcompat-v7:+'
-    compile files ('libs/jsoup-1.7.3.jar')
+    compile 'com.android.support:appcompat-v7:+'
+    compile files('libs/jsoup-1.7.3.jar')
+    compile files('libs/volley.jar')
     compile 'com.j256.ormlite:ormlite-android:4.47'
+    compile files('libs/volley.jar')
 }

@@ -55,6 +55,7 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Publications, Integer> publicationsDao = null;
     private Dao<CompanyNews, Integer> companyNewsDao = null;
     private Dao<Anons, Integer> anonsDao = null;
+    private Dao<Blogs, Integer> blogsDao = null;
 
     private final Context myContext;
 
@@ -153,6 +154,13 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
         return anonsDao;
     }
 
+    public Dao<Blogs, Integer> getBlogsDao() throws SQLException {
+        if(blogsDao == null){
+            blogsDao = getDao(Blogs.class);
+        }
+        return blogsDao;
+    }
+
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -162,6 +170,62 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
         postsDao = null;
         commentsDao = null;
     }
+
+
+    public void parseBlogsSafe(final String url){
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    parseBlogs(url);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }catch (SQLException e1){
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
+    //TODO add data parsing
+    public void parseBlogs(String url) throws SQLException, IOException {
+
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException ex) {
+            Logger.getLogger(UaEnergyParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        Element content = doc.getElementById("post-list");
+
+        Elements authorLinks = content.select("div.blog-author");
+        Elements avatarLinks = content.getElementsByTag("img");
+        Elements blogTitle = content.select("div.blog-title");
+
+        int len = avatarLinks.size();
+
+        int j = 0;
+        Log.d(TAG, "Adding blogs to DB");
+        for(int  i = 0; i < len; i++){
+            Blogs post = new Blogs();
+            post.setId(i);
+            post.setAuthor(authorLinks.get(i).text());
+            post.setPhoto(avatarLinks.get(i).attr("src"));
+            post.setLinkText(blogTitle.get(i).text());
+            post.setLink(blogTitle.get(i).select("a[href]").attr("abs:href"));
+
+            post.setDate("");
+
+
+            blogsDao.createOrUpdate(post);
+        }
+
+
+    }
+
+
 
     public void parseAnonsSafe(final String url){
         new Thread(new Runnable() {

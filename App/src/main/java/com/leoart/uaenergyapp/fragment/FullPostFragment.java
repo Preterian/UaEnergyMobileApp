@@ -2,6 +2,7 @@ package com.leoart.uaenergyapp.fragment;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,6 +63,17 @@ public class FullPostFragment extends Fragment {
         //if (extras != null) {
         final String  url = extras.getString("postUrl");
         // }
+
+        Button share = (Button) view.findViewById(R.id.share_button);
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+                startActivity(Intent.createChooser(shareIntent, "Share..."));
+            }
+        });
 
 
         final ProgressDialog pDialog = new ProgressDialog(
