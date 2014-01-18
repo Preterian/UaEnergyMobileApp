@@ -492,6 +492,12 @@ public class DataBaseHelper extends OrmLiteSqliteOpenHelper {
         return true;
     }
 
+    //TODO
+    public void parseHomePage(){
+
+
+    }
+
 
     public void reset(){
         SQLiteDatabase db = this.getWritableDatabase(); // helper is object extends SQLiteOpenHelper

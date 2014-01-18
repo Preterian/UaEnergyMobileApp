@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.BlogCursorAdapter;
@@ -23,6 +24,7 @@ import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
 import com.leoart.uaenergyapp.model.Analytic;
 import com.leoart.uaenergyapp.model.Blogs;
+import com.leoart.uaenergyapp.utils.Rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -66,8 +68,12 @@ public class BlogsFragment extends Fragment {
                 boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 
                 if(loadMore && loading == false){
-                    new loadMoreListView().execute();
-                    loading = true;
+                    if(Rest.isNetworkOnline()){
+                        new loadMoreListView().execute();
+                        loading = true;
+                    }else{
+                        Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                    }
                     Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
                 }
             }
@@ -132,11 +138,6 @@ public class BlogsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "Fragment1 onCreate");
-
-        // UaEnergyApp.clearDataBase();
-
-        UaEnergyApp.getDatabaseHelper().parseBlogsSafe(newsPostsUrl);
-
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {

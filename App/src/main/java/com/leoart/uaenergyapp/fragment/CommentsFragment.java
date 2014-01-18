@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
@@ -22,6 +23,7 @@ import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
 import com.leoart.uaenergyapp.model.Comments;
 import com.leoart.uaenergyapp.model.Post;
+import com.leoart.uaenergyapp.utils.Rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -64,8 +66,12 @@ public class CommentsFragment extends Fragment {
                 boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 
                 if(loadMore && loading == false){
-                    new loadMoreListView().execute();
-                    loading = true;
+                    if(Rest.isNetworkOnline()){
+                        new loadMoreListView().execute();
+                        loading = true;
+                    }else{
+                        Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                    }
                     Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
                 }
             }
@@ -129,7 +135,9 @@ public class CommentsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         Log.d(LOG_TAG, "Fragment1 onCreate");
-        UaEnergyApp.getDatabaseHelper().parsePostsNews(commentsPostsUrl, "comments");
+        //if(Rest.isNetworkOnline()){
+         //   UaEnergyApp.getDatabaseHelper().parsePostsNews(commentsPostsUrl, "comments");
+       // }
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {

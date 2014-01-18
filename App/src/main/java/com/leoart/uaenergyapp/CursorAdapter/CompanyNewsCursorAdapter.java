@@ -45,16 +45,17 @@ public class CompanyNewsCursorAdapter extends BaseAdapter {
 
         ViewHolder vh;
 
-      //  if(convertView == null){
-        LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = li.inflate(R.layout.company_news_cell, parent, false);
+        if(convertView == null){
+            LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = li.inflate(R.layout.company_news_cell, parent, false);
 
-        vh = new ViewHolder();
-        vh.postDate = (TextView) convertView.findViewById(R.id.company_news_date);
-        vh.postTitle = (TextView) convertView.findViewById(R.id.company_news_title);
-        // }else{
-        //     vh = (ViewHolder) convertView.getTag();
-       // }
+            vh = new ViewHolder();
+            vh.postDate = (TextView) convertView.findViewById(R.id.company_news_date);
+            vh.postTitle = (TextView) convertView.findViewById(R.id.company_news_title);
+            convertView.setTag(vh);
+        }else{
+            vh = (ViewHolder) convertView.getTag();
+        }
 
         getCursor().moveToPosition(position);
 

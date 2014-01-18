@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkError;
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
@@ -53,7 +54,6 @@ public class PostsFragment extends Fragment {
         View view = inflater.inflate(R.layout.posts, container, false);
 
         try {
-            // UaEnergyApp.getDatabaseHelper().parsePosts();
             postsDao = UaEnergyApp.getDatabaseHelper().getPostsDao();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -78,8 +78,14 @@ public class PostsFragment extends Fragment {
                 boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 
                 if(loadMore && loading == false){
-                    new loadMoreListView().execute();
-                    loading = true;
+
+                    if(Rest.isNetworkOnline()){
+                        new loadMoreListView().execute();
+                        loading = true;
+                    }else{
+                        Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                    }
+
                    Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
                 }
             }
@@ -89,6 +95,10 @@ public class PostsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long ID) {
 
+                if(Rest.isNetworkOnline() == false){
+                    Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 Cursor cursor = mAdapter.getCursor();
                 cursor.moveToPosition(position);
@@ -128,9 +138,6 @@ public class PostsFragment extends Fragment {
 
         });
 
-/*        if(pDialog.isShowing())
-            pDialog.dismiss();*/
-
         return view;
     }
 
@@ -146,9 +153,8 @@ public class PostsFragment extends Fragment {
         Log.d(LOG_TAG, "Fragment1 onCreate");
         Log.d(LOG_TAG, "TIIIITLE = " +  getActivity().getTitle());
 
-       // UaEnergyApp.clearDataBase();
-
-        UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl, "news");
+       // if(Rest.isNetworkOnline())
+        //    UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl, "news");
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -253,6 +259,8 @@ public class PostsFragment extends Fragment {
         }
 
         protected Void doInBackground(Void... unused) {
+
+
                     // increment current page
                     currentPage += 1;
 
@@ -266,7 +274,6 @@ public class PostsFragment extends Fragment {
             }catch (SQLException e1){
                 e1.printStackTrace();
             }
-
 
             getActivity().runOnUiThread(new Runnable() {
                @Override

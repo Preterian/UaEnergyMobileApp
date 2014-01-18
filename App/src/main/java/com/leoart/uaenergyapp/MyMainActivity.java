@@ -20,6 +20,7 @@ import com.leoart.uaenergyapp.fragment.BlogsFragment;
 import com.leoart.uaenergyapp.fragment.CommentsFragment;
 import com.leoart.uaenergyapp.fragment.CompanyNewsFragment;
 import com.leoart.uaenergyapp.fragment.FragmentNavigationDrawer;
+import com.leoart.uaenergyapp.fragment.HomeFragment;
 import com.leoart.uaenergyapp.fragment.PostsFragment;
 import com.leoart.uaenergyapp.fragment.PublicationsFragment;
 import com.leoart.uaenergyapp.model.Anons;
@@ -45,6 +46,7 @@ public class MyMainActivity extends FragmentActivity {
         dlDrawer.setupDrawerConfiguration((ListView) findViewById(R.id.lvDrawer),
                 R.layout.drawer_nav_item, R.id.flContent);
         // Add nav items
+       // dlDrawer.addNavItem("Головна", "Головна", HomeFragment.class);
         dlDrawer.addNavItem("Новини", "Новини", PostsFragment.class);
         dlDrawer.addNavItem("Анонси", "Анонси", AnonsFragment.class);
         dlDrawer.addNavItem("Коментарі", "Коментарі", CommentsFragment.class);

@@ -45,16 +45,19 @@ public class AnonsCursorAdapter  extends BaseAdapter {
 
         ViewHolder vh;
 
-        //  if(convertView == null){
-        LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = li.inflate(R.layout.anons_cell, parent, false);
+        if(convertView == null){
+            LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = li.inflate(R.layout.anons_cell, parent, false);
 
-        vh = new ViewHolder();
-        vh.postInfo = (TextView) convertView.findViewById(R.id.anons_info);
-        vh.postTitle = (TextView) convertView.findViewById(R.id.anons_title);
-        // }else{
-        //     vh = (ViewHolder) convertView.getTag();
-        //}
+            vh = new ViewHolder();
+            vh.postInfo = (TextView) convertView.findViewById(R.id.anons_info);
+            vh.postTitle = (TextView) convertView.findViewById(R.id.anons_title);
+
+            convertView.setTag(vh);
+
+        }else{
+            vh = (ViewHolder) convertView.getTag();
+        }
 
         getCursor().moveToPosition(position);
 

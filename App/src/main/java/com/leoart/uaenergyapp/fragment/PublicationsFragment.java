@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
@@ -22,6 +23,7 @@ import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
 import com.leoart.uaenergyapp.model.Analytic;
 import com.leoart.uaenergyapp.model.Publications;
+import com.leoart.uaenergyapp.utils.Rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -65,8 +67,12 @@ public class PublicationsFragment extends Fragment {
                 boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 
                 if(loadMore && loading == false){
-                    new loadMoreListView().execute();
-                    loading = true;
+                    if(Rest.isNetworkOnline()){
+                        new loadMoreListView().execute();
+                        loading = true;
+                    }else{
+                        Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                    }
                     Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
                 }
             }
@@ -128,11 +134,9 @@ public class PublicationsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "Fragment1 onCreate");
-
-        // UaEnergyApp.clearDataBase();
-
-        UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl, "publications");
-
+     //   if(Rest.isNetworkOnline()){
+      //      UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl, "publications");
+       // }
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {

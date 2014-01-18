@@ -25,6 +25,7 @@ import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
 import com.leoart.uaenergyapp.model.Analytic;
 import com.leoart.uaenergyapp.model.Post;
+import com.leoart.uaenergyapp.utils.Rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -68,8 +69,12 @@ public class AnalyticFragment extends Fragment {
                 boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 
                 if(loadMore && loading == false){
-                    new loadMoreListView().execute();
-                    loading = true;
+                    if(Rest.isNetworkOnline()){
+                        new loadMoreListView().execute();
+                        loading = true;
+                    }else{
+                        Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                    }
                     Log.d(LOG_TAG, "Laaaaast One scrolled!!!");
                 }
             }
@@ -118,9 +123,6 @@ public class AnalyticFragment extends Fragment {
 
         });
 
-/*        if(pDialog.isShowing())
-            pDialog.dismiss();*/
-
         return view;
     }
 
@@ -135,9 +137,8 @@ public class AnalyticFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "Fragment1 onCreate");
 
-        // UaEnergyApp.clearDataBase();
-
-        //UaEnergyApp.getDatabaseHelper().parsePostsNews(newsPostsUrl);
+        //if(Rest.isNetworkOnline())
+            //UaEnergyApp.getDatabaseHelper().
 
     }
 

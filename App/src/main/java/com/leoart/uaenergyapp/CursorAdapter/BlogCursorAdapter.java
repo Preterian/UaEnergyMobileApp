@@ -60,18 +60,21 @@ public class BlogCursorAdapter extends BaseAdapter {
 
         ViewHolder vh;
 
-        //  if(convertView == null){
-        LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = li.inflate(R.layout.blog_cell, parent, false);
+        if(convertView == null){
+            LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = li.inflate(R.layout.blog_cell, parent, false);
 
-        vh = new ViewHolder();
-        vh.blog_author_name = (TextView) convertView.findViewById(R.id.blog_author_name);
-        vh.blogDate = (TextView) convertView.findViewById(R.id.blog_date);
-        vh.blogTitle = (TextView) convertView.findViewById(R.id.blog_title);
-        vh.blog_author_img = (NetworkImageView) convertView.findViewById(R.id.blog_author_img);
-        // }else{
-        //     vh = (ViewHolder) convertView.getTag();
-        //}
+            vh = new ViewHolder();
+            vh.blog_author_name = (TextView) convertView.findViewById(R.id.blog_author_name);
+            vh.blogDate = (TextView) convertView.findViewById(R.id.blog_date);
+            vh.blogTitle = (TextView) convertView.findViewById(R.id.blog_title);
+            vh.blog_author_img = (NetworkImageView) convertView.findViewById(R.id.blog_author_img);
+
+            convertView.setTag(vh);
+
+        }else{
+             vh = (ViewHolder) convertView.getTag();
+        }
 
         getCursor().moveToPosition(position);
 

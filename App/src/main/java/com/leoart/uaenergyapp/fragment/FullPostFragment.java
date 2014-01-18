@@ -1,5 +1,6 @@
 package com.leoart.uaenergyapp.fragment;
 
+import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkError;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
@@ -78,7 +80,7 @@ public class FullPostFragment extends Fragment {
 
         final ProgressDialog pDialog = new ProgressDialog(
                 getActivity());
-        pDialog.setMessage("Please wait...");
+        pDialog.setMessage("Зачекайте будь ласка...");
         pDialog.setIndeterminate(true);
         pDialog.setCancelable(false);
         pDialog.show();
@@ -89,7 +91,6 @@ public class FullPostFragment extends Fragment {
 
         new Thread(new Runnable() {
             public void run() {
-
 
                 Document doc = null;
                 try {

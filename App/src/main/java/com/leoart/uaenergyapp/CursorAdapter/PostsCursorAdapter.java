@@ -49,7 +49,7 @@ public class PostsCursorAdapter extends BaseAdapter {
 
         ViewHolder vh;
 
-      //  if(convertView == null){
+        if(convertView == null){
             LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = li.inflate(R.layout.post_cell, parent, false);
 
@@ -57,9 +57,12 @@ public class PostsCursorAdapter extends BaseAdapter {
             vh.postDate = (TextView) convertView.findViewById(R.id.post_date);
             vh.postInfo = (TextView) convertView.findViewById(R.id.post_info);
             vh.postTitle = (TextView) convertView.findViewById(R.id.post_title);
-       // }else{
-       //     vh = (ViewHolder) convertView.getTag();
-        //}
+
+            convertView.setTag(vh);
+
+        }else{
+            vh = (ViewHolder) convertView.getTag();
+        }
 
         getCursor().moveToPosition(position);
 
