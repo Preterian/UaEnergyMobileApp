@@ -2,30 +2,21 @@ package com.leoart.uaenergyapp.fragment;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.j256.ormlite.dao.Dao;
-import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
 import com.leoart.uaenergyapp.VolleySingleton;
-import com.leoart.uaenergyapp.model.Analytic;
 import com.leoart.uaenergyapp.parser.UaEnergyParser;
 
 import org.jsoup.Jsoup;
@@ -34,7 +25,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

@@ -2,6 +2,7 @@
 <resources>
 
     <string name="refresh">Оновити</string>
+    <string name="share">Поділитись</string>
     <string name="app_name">UaEnergyMobile</string>
     <string name="title_section1">Анонси</string>
     <string name="title_section2">Новини</string>

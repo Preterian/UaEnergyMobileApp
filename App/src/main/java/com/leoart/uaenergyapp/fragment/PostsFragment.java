@@ -3,28 +3,21 @@ package com.leoart.uaenergyapp.fragment;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.NetworkError;
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
@@ -35,6 +28,9 @@ import com.leoart.uaenergyapp.utils.Rest;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 
 /**
@@ -46,6 +42,7 @@ public class PostsFragment extends Fragment {
     private static final String TAG = "PostsFragment";
     final String LOG_TAG = "myLogs";
 
+    private PullToRefreshLayout mPullToRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,6 +57,35 @@ public class PostsFragment extends Fragment {
         }
 
         lvMain = (ListView) view.findViewById(R.id.lvMain);
+
+        // Now find the PullToRefreshLayout to setup
+        mPullToRefreshLayout = (PullToRefreshLayout) view.findViewById(R.id.ptr_layout);
+
+        // Now setup the PullToRefreshLayout
+        ActionBarPullToRefresh.from(getActivity())
+                // Mark All Children as pullable
+                .allChildrenArePullable()
+                // Here we mark just the ListView and it's Empty View as pullable
+               // .theseChildrenArePullable(android.R.id.list, android.R.id.empty)
+                        // Set the OnRefreshListener
+                .listener(new OnRefreshListener() {
+                    @Override
+                    public void onRefreshStarted(View view) {
+                        if(Rest.isNetworkOnline()){
+                            new loadMoreListView().execute();
+                            loading = true;
+                            loadingFirstPage = true;
+
+                        }else{
+                            Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                        }
+                        
+                    }
+                })
+                        // Finally commit the setup to our PullToRefreshLayout
+                .setup(mPullToRefreshLayout);
+
+
 
         mAdapter = new PostsCursorAdapter(UaEnergyApp.context, getCursor());
 
@@ -221,7 +247,7 @@ public class PostsFragment extends Fragment {
     private int currentPage = 1;
 
     private boolean loading = false;
-    private boolean loadedAll = false;
+    private boolean loadingFirstPage = false;
 
     private PostsCursorAdapter mAdapter;
     private Dao<Post, Integer> postsDao;
@@ -236,7 +262,7 @@ public class PostsFragment extends Fragment {
     }
 
 
-    static ProgressDialog pDialog;
+  //  static ProgressDialog pDialog;
 
 
     /**
@@ -250,22 +276,28 @@ public class PostsFragment extends Fragment {
         protected void onPreExecute() {
             // Showing progress dialog before sending http request
             Log.d(LOG_TAG, "Setting progressDialog");
-           pDialog = new ProgressDialog(
+        /*   pDialog = new ProgressDialog(
                     getActivity());
             pDialog.setMessage("Почекайте будь ласка, дані завантажуються..");
             pDialog.setIndeterminate(true);
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show();*/
         }
 
         protected Void doInBackground(Void... unused) {
 
-
+            String URL = newsPostsUrl;
+            if(loadingFirstPage == false){
                     // increment current page
                     currentPage += 1;
 
                     // Next page request
-                    String URL = newsPostsUrl.concat("/") + currentPage;
+                     URL = newsPostsUrl.concat("/") + currentPage;
+            }
+
+            Log.d(TAG, "loaging " + loadingFirstPage);
+            loadingFirstPage = false;
+
 
             try {
                UaEnergyApp.getDatabaseHelper().parseData(URL,"news");
@@ -278,8 +310,6 @@ public class PostsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                @Override
                 public void run() {
-                    // get listview current position - used to maintain scroll position
-                   // int currentPosition = lvMain.getFirstVisiblePosition();
                     refreshAdapter();
                 }
             });
@@ -290,7 +320,8 @@ public class PostsFragment extends Fragment {
         protected void onPostExecute(Void unused) {
             // closing progress dialog
             Log.d(LOG_TAG, "Dismissing progress Dialog");
-            pDialog.dismiss();
+            mPullToRefreshLayout.setRefreshComplete();
+         //   pDialog.dismiss();
         }
     }
 

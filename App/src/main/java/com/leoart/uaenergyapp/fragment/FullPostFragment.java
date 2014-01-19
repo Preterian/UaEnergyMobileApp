@@ -1,37 +1,34 @@
 package com.leoart.uaenergyapp.fragment;
 
-import android.accounts.NetworkErrorException;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.NetworkError;
-import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
 import com.leoart.uaenergyapp.model.FullPost;
-import com.leoart.uaenergyapp.model.Post;
 import com.leoart.uaenergyapp.parser.UaEnergyParser;
+import com.leoart.uaenergyapp.utils.Rest;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +39,8 @@ public class FullPostFragment extends Fragment {
 
 
     final String LOG_TAG = "FullPostFRAGMENT";
+
+    String postLink = null;
 
     TextView postDateView;
     TextView postAuthorView;
@@ -65,18 +64,7 @@ public class FullPostFragment extends Fragment {
         //if (extras != null) {
         final String  url = extras.getString("postUrl");
         // }
-
-        Button share = (Button) view.findViewById(R.id.share_button);
-        share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                startActivity(Intent.createChooser(shareIntent, "Share..."));
-            }
-        });
-
+        postLink = url;
 
         final ProgressDialog pDialog = new ProgressDialog(
                 getActivity());
@@ -155,6 +143,34 @@ public class FullPostFragment extends Fragment {
         return view;
     }
 
+    protected static final int BTN_SHARE = 0x1020;
+
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.main, menu);
+
+        MenuItem item = menu.add(0, BTN_SHARE, 0, R.string.share);
+        item.setIcon(R.drawable.ic_action_share);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (Rest.isNetworkOnline()) {
+                    //should share current link
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, postLink);
+                    startActivity(Intent.createChooser(shareIntent, "Share..."));
+                }
+
+                return false;
+            }
+        });
+    }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -165,6 +181,7 @@ public class FullPostFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "Fragment1 onCreate");
+        setHasOptionsMenu(true);
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {

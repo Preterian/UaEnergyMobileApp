@@ -19,15 +19,17 @@ import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.leoart.uaenergyapp.CursorAdapter.AnonsCursorAdapter;
-import com.leoart.uaenergyapp.CursorAdapter.PostsCursorAdapter;
 import com.leoart.uaenergyapp.R;
 import com.leoart.uaenergyapp.UaEnergyApp;
-import com.leoart.uaenergyapp.model.Analytic;
 import com.leoart.uaenergyapp.model.Anons;
 import com.leoart.uaenergyapp.utils.Rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * Created by bogdan on 1/14/14.
@@ -36,6 +38,8 @@ public class AnonsFragment extends Fragment {
 
     private static final String TAG = "AnonsFragment";
     final String LOG_TAG = "AnonsFragment";
+
+    private PullToRefreshLayout mPullToRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +54,31 @@ public class AnonsFragment extends Fragment {
         }
 
         lvMain = (ListView) view.findViewById(R.id.lvMain);
+
+        // Now find the PullToRefreshLayout to setup
+        mPullToRefreshLayout = (PullToRefreshLayout) view.findViewById(R.id.ptr_layout);
+
+        // Now setup the PullToRefreshLayout
+        ActionBarPullToRefresh.from(getActivity())
+                // Mark All Children as pullable
+                .allChildrenArePullable()
+                        // Set the OnRefreshListener
+                .listener(new OnRefreshListener() {
+                    @Override
+                    public void onRefreshStarted(View view) {
+                        if(Rest.isNetworkOnline()){
+                            new loadMoreListView().execute();
+                            loading = true;
+
+                        }else{
+                            Toast.makeText(UaEnergyApp.context, "Необхідне підключення до інтернету...", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                })
+                        // Finally commit the setup to our PullToRefreshLayout
+                .setup(mPullToRefreshLayout);
+
 
         mAdapter = new AnonsCursorAdapter(UaEnergyApp.context, getCursor());
 
@@ -214,7 +243,7 @@ public class AnonsFragment extends Fragment {
     }
 
 
-    ProgressDialog pDialog;
+   // ProgressDialog pDialog;
 
 
     /**
@@ -228,12 +257,12 @@ public class AnonsFragment extends Fragment {
         protected void onPreExecute() {
             // Showing progress dialog before sending http request
             Log.d(LOG_TAG, "Setting progressDialog");
-            pDialog = new ProgressDialog(
+        /*    pDialog = new ProgressDialog(
                     getActivity());
             pDialog.setMessage("Почекайте будь ласка, дані завантажуються..");
             pDialog.setIndeterminate(true);
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show(); */
         }
 
         protected Void doInBackground(Void... unused) {
@@ -270,7 +299,8 @@ public class AnonsFragment extends Fragment {
         protected void onPostExecute(Void unused) {
             // closing progress dialog
             Log.d(LOG_TAG, "Dismissing progress Dialog");
-            pDialog.dismiss();
+           // pDialog.dismiss();
+            mPullToRefreshLayout.setRefreshComplete();
         }
     }
 
